@@ -297,3 +297,51 @@ int osmo_plmn_cmp(const struct osmo_plmn_id *a, const struct osmo_plmn_id *b)
 		return 1;
 	return osmo_mnc_cmp(a->mnc, a->mnc_3_digits, b->mnc, b->mnc_3_digits);
 }
+
+/*! Generate TS 23.003 Section 19.2 Home Network Realm/Domain (text form)
+ *  \param out[out] caller-provided output buffer, at least 33 bytes long
+ *  \param mcc[in] Mobile Country Code
+ *  \param mnc[in] Mobile Network Code
+ *  \returns number of characters printed (excluding NUL); negative on error */
+int osmo_gen_home_network_domain(char *out, uint16_t mcc, uint16_t mnc)
+{
+	if (mcc > 999)
+		return -EINVAL;
+	if (mnc > 999)
+		return -EINVAL;
+	return sprintf(out, "epc.mnc%03u.mcc%03u.3gppnetwork.org", mcc, mnc);
+}
+
+/*! Generate TS 23.003 Section 19.4.2.4 MME Domain (text form)
+ *  \param out[out] caller-provided output buffer, at least 56 bytes long
+ *  \param mmec[in] MME Code
+ *  \param mmegi[in] MME Group Identifier
+ *  \param mcc[in] Mobile Country Code
+ *  \param mnc[in] Mobile Network Code
+ *  \returns number of characters printed (excluding NUL); negative on error */
+int osmo_gen_mme_domain(char *out, uint8_t mmec, uint16_t mmegi, uint16_t mcc, uint16_t mnc)
+{
+	char domain[GSM23003_HOME_NETWORK_DOMAIN_LEN+1];
+	int rc;
+	rc = osmo_gen_home_network_domain(domain, mcc, mnc);
+	if (rc < 0)
+		return rc;
+	return sprintf(out, "mmec%02x.mmegi%04x.mme.%s", mmec, mmegi, domain);
+}
+
+/*! Generate TS 23.003 Section 19.4.2.4 MME Group Domain (text form)
+ *  \param out[out] caller-provided output buffer, at least 56 bytes long
+ *  \param mmec[in] MME Code
+ *  \param mmegi[in] MME Group Identifier
+ *  \param mcc[in] Mobile Country Code
+ *  \param mnc[in] Mobile Network Code
+ *  \returns number of characters printed (excluding NUL); negative on error */
+int osmo_gen_mme_group_domain(char *out, uint16_t mmegi, uint16_t mcc, uint16_t mnc)
+{
+	char domain[GSM23003_HOME_NETWORK_DOMAIN_LEN+1];
+	int rc;
+	rc = osmo_gen_home_network_domain(domain, mcc, mnc);
+	if (rc < 0)
+		return rc;
+	return sprintf(out, "mmegi%04x.mme.%s", mmegi, domain);
+}

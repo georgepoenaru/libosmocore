@@ -120,3 +120,7 @@ static inline int osmo_mcc_from_str(const char *mcc_str, uint16_t *mcc)
 
 int osmo_mnc_cmp(uint16_t a_mnc, bool a_mnc_3_digits, uint16_t b_mnc, bool b_mnc_3_digits);
 int osmo_plmn_cmp(const struct osmo_plmn_id *a, const struct osmo_plmn_id *b);
+
+int osmo_gen_home_network_domain(char *out, uint16_t mcc, uint16_t mnc);
+int osmo_gen_mme_domain(char *out, uint8_t mmec, uint16_t mmegi, uint16_t mcc, uint16_t mnc);
+int osmo_gen_mme_group_domain(char *out, uint16_t mmegi, uint16_t mcc, uint16_t mnc);
